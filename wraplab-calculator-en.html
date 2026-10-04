@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRAPLAB — Instant Estimate</title>
+<style>
+@font-face{font-family:'Geologica';font-style:normal;font-display:swap;font-weight:100 900;src:url(geologica-latin-ext-wght-normal.woff2) format('woff2-variations');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Geologica';font-style:normal;font-display:swap;font-weight:100 900;src:url(geologica-latin-wght-normal.woff2) format('woff2-variations');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-display:swap;font-weight:500;src:url(ibm-plex-mono-latin-ext-500-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-display:swap;font-weight:500;src:url(ibm-plex-mono-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-display:swap;font-weight:600;src:url(ibm-plex-mono-latin-ext-600-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-display:swap;font-weight:600;src:url(ibm-plex-mono-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+  :root{
+    --bg:#0a0b0d;
+    --bg2:#0f1115;
+    --card:#14171c;
+    --line:rgba(255,255,255,.08);
+    --line2:rgba(255,255,255,.15);
+    --ink:#f2f4f6;
+    --dim:#969ca4;
+    --accent:#e23b30;
+    --accent-d:#bd2c22;
+    --accent-soft:rgba(226,59,48,.12);
+    --disp:'Geologica',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:var(--disp);font-weight:400;line-height:1.5;
+    -webkit-font-smoothing:antialiased;padding:36px 20px 60px;
+  }
+  .wrap{max-width:1020px;margin:0 auto}
+
+  .eyebrow{font-family:var(--mono);font-weight:500;font-size:12px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 16px}
+  .eyebrow b{color:var(--accent);font-weight:600}
+  h1{font-family:var(--disp);font-weight:800;font-size:clamp(30px,5.2vw,50px);
+    line-height:1.02;letter-spacing:-.02em;margin:0 0 14px;max-width:15ch}
+  .lede{color:var(--dim);font-size:16px;max-width:54ch;margin:0}
+
+  .calc{display:grid;grid-template-columns:1.12fr .88fr;gap:18px;margin-top:38px;align-items:start}
+  @media(max-width:840px){.calc{grid-template-columns:1fr}}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+
+  .block{padding:20px 0;border-top:1px solid var(--line)}
+  .block:first-child{padding-top:0;border-top:0}
+  .block-label{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--dim);margin:0 0 14px}
+  .block-label .n{color:var(--accent);margin-right:6px}
+
+  .chips{display:grid;gap:8px}
+  .chip{font-family:var(--disp);font-weight:500;font-size:13.5px;text-align:left;
+    border:1px solid var(--line2);background:transparent;color:var(--ink);
+    border-radius:11px;padding:12px 13px;cursor:pointer;transition:.15s;line-height:1.25}
+  .chip small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:4px;letter-spacing:.03em}
+  .chip:hover{border-color:var(--dim)}
+  .chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+  .chip[aria-pressed="true"] small{color:#e88a83}
+  .chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  .g5{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:1fr 1fr 1fr}
+  @media(max-width:480px){.g5{grid-template-columns:1fr}}
+
+  /* ---- result ---- */
+  .result{position:sticky;top:22px}
+  .tag{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-weight:500;
+    font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:18px}
+  .dot{width:13px;height:13px;border-radius:4px;border:1px solid var(--line2)}
+
+  .from{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--dim);margin:0 0 4px}
+  .price{font-family:var(--disp);font-weight:800;letter-spacing:-.03em;line-height:1;
+    font-size:clamp(46px,9vw,66px)}
+  .price .c{color:var(--accent);font-size:.6em;font-weight:700;vertical-align:.06em;margin-right:2px}
+
+  .tape{position:relative;height:44px;margin:22px 0;border-radius:8px;
+    background:#1b1f26;border:1px solid var(--line);overflow:hidden}
+  .tape.off{opacity:.35}
+  .tape-fill{position:absolute;left:0;top:0;bottom:0;width:0;
+    border-right:2px solid rgba(255,255,255,.35);transition:width .5s cubic-bezier(.22,.61,.36,1)}
+  .film-gloss{background:linear-gradient(180deg,#3b414a,#14161a 46%,#262b32 56%,#0b0d10)}
+  .film-matte{background:#2b2f35}
+  .film-satin{background:linear-gradient(180deg,#3c424a,#22262c)}
+  .film-chrome{background:linear-gradient(180deg,#eef2f6,#9aa6b3 22%,#e2e9ef 42%,#707c8a 62%,#c6cfd8 82%,#8a95a2)}
+  .ticks{position:absolute;inset:0;pointer-events:none}
+  .tick{position:absolute;bottom:0;width:1px;background:rgba(255,255,255,.22)}
+  .tick.h{background:rgba(255,255,255,.4)}
+  .tick-num{position:absolute;top:5px;transform:translateX(-50%);font-family:var(--mono);font-size:9px;color:var(--dim)}
+
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:11px;overflow:hidden;margin-bottom:18px}
+  .stat{background:var(--card);padding:13px 14px}
+  .stat .k{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+  .stat .v{font-family:var(--disp);font-weight:600;font-size:16px}
+
+  .cta{display:block;width:100%;text-align:center;text-decoration:none;
+    font-family:var(--disp);font-weight:600;font-size:15px;
+    background:var(--accent);color:#fff;border:0;border-radius:12px;padding:15px;cursor:pointer;transition:.15s}
+  .cta:hover{background:var(--accent-d)}
+  .cta:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+  .foot{margin-top:18px;font-size:12px;color:var(--dim);max-width:60ch;line-height:1.6}
+  .hidden{display:none}
+
+  @media(prefers-reduced-motion:reduce){.tape-fill{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow"><b>//</b> instant estimate</p>
+  <h1>Estimate your wrap in seconds</h1>
+  <p class="lede">Pick a service, your car and coverage — get an indicative price, timeline and film amount. Exact quote from photos, same day.</p>
+
+  <div class="calc">
+    <!-- CONFIG -->
+    <div class="panel">
+      <div class="block">
+        <p class="block-label"><span class="n">/ 01</span> Service</p>
+        <div class="chips" id="service-chips"></div>
+      </div>
+      <div class="block">
+        <p class="block-label"><span class="n">/ 02</span> Vehicle</p>
+        <div class="chips g5" id="vehicle-chips"></div>
+      </div>
+      <div class="block" id="coverage-block">
+        <p class="block-label"><span class="n">/ 03</span> Coverage</p>
+        <div class="chips g3" id="coverage-chips"></div>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <aside class="panel result">
+      <span class="tag"><span class="dot" id="dot"></span><span id="svc-name">Color change</span></span>
+      <p class="from">Estimated from</p>
+      <div class="price"><span class="c">€</span><span id="price">1,900</span></div>
+
+      <div class="tape" id="tape"><div class="tape-fill film-gloss" id="fill"></div><div class="ticks" id="ticks"></div></div>
+
+      <div class="stats">
+        <div class="stat"><div class="k">Timeline</div><div class="v" id="days">2–4 days</div></div>
+        <div class="stat"><div class="k">Film needed</div><div class="v"><span id="film">20</span> m</div></div>
+        <div class="stat"><div class="k">Coverage area</div><div class="v"><span id="area">30</span> m²</div></div>
+        <div class="stat"><div class="k">Finish</div><div class="v" id="finish">Gloss</div></div>
+      </div>
+
+      <a class="cta" id="cta" href="#" target="_blank" rel="noopener">Get your exact quote</a>
+      <p class="foot">Indicative estimate for planning. Final price and film amount are confirmed from photos of your car — send them on Telegram and we reply the same day.</p>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+  const services = {
+    color: {label:'Color change', sub:'Gloss film',        base:1900, days:'2–4 days', film:true,  finish:'gloss',  fname:'Gloss'},
+    matte: {label:'Matte & satin', sub:'Textured finish',   base:2200, days:'3–4 days', film:true,  finish:'matte',  fname:'Matte / satin'},
+    chrome:{label:'Chrome & chameleon', sub:'Color-shift',  base:3500, days:'3–5 days', film:true,  finish:'chrome', fname:'Chrome / chameleon'},
+    ppf:   {label:'PPF protection', sub:'Self-healing',     base:2600, days:'2–4 days', film:true,  finish:'satin',  fname:'Clear PPF'},
+    tint:  {label:'Window tint', sub:'Ceramic / athermal',  base:250,  days:'1 day',    film:false, finish:'matte',  fname:'Ceramic tint'},
+  };
+  const vehicles = {
+    compact:{label:'Compact', sub:'hatchback', mult:0.85, m:15},
+    sedan:  {label:'Sedan',   sub:'saloon',    mult:1.0,  m:18},
+    coupe:  {label:'Coupe',   sub:'sports',    mult:0.95, m:16},
+    suv:    {label:'SUV',     sub:'crossover', mult:1.25, m:22},
+    van:    {label:'Pickup',  sub:'van',       mult:1.4,  m:25},
+  };
+  const coverage = {
+    full:   {label:'Full',    sub:'whole body', f:1},
+    partial:{label:'Partial', sub:'roof/hood',  f:0.6},
+    accents:{label:'Accents', sub:'trim/parts', f:0.35},
+  };
+
+  const state = {service:'color', vehicle:'sedan', coverage:'full'};
+  const $ = id => document.getElementById(id);
+  let displayed = 0, lastScale = -1;
+
+  function buildChips(containerId, data, key, subKey){
+    const c = $(containerId); c.innerHTML='';
+    Object.keys(data).forEach(k=>{
+      const b=document.createElement('button');
+      b.className='chip'; b.dataset.key=k;
+      b.setAttribute('aria-pressed', k===state[key]);
+      b.innerHTML = data[k].label + (data[k][subKey]?('<small>'+data[k][subKey]+'</small>'):'');
+      b.onclick=()=>{ state[key]=k;
+        [...c.children].forEach(ch=>ch.setAttribute('aria-pressed', ch.dataset.key===k));
+        render(); };
+      c.appendChild(b);
+    });
+  }
+  buildChips('service-chips', services, 'service', 'sub');
+  buildChips('vehicle-chips', vehicles, 'vehicle', 'sub');
+  buildChips('coverage-chips', coverage, 'coverage', 'sub');
+
+  function buildTicks(scaleMax){
+    const t=$('ticks'); t.innerHTML='';
+    for(let i=0;i<=scaleMax;i++){
+      const left=(i/scaleMax)*100, heavy=i%5===0;
+      const m=document.createElement('div');
+      m.className='tick'+(heavy?' h':''); m.style.left=left+'%';
+      m.style.height=heavy?'13px':'7px'; t.appendChild(m);
+      if(heavy&&i>0){const n=document.createElement('div');
+        n.className='tick-num';n.style.left=left+'%';n.textContent=i;t.appendChild(n);}
+    }
+  }
+
+  function animate(target, apply){
+    if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){displayed=target;apply(target);return;}
+    const start=displayed,t0=performance.now(),dur=360;
+    (function step(now){const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,3);
+      displayed=start+(target-start)*e;apply(displayed);
+      if(p<1)requestAnimationFrame(step);else displayed=target;})(performance.now());
+  }
+
+  function render(){
+    const s=services[state.service], v=vehicles[state.vehicle], cov=coverage[state.coverage];
+
+    // coverage only relevant for wrap/ppf, not tint
+    const useCov = s.film;
+    $('coverage-block').classList.toggle('hidden', !useCov);
+    const covF = useCov ? cov.f : 1;
+
+    // price
+    const price = Math.round((s.base * v.mult * covF)/50)*50;
+    animate(price, val=>$('price').textContent=Math.round(val).toLocaleString('en-US'));
+
+    // service tag + finish
+    $('svc-name').textContent=s.label;
+    $('finish').textContent=s.fname;
+    const dotBg={gloss:'linear-gradient(135deg,#3b414a,#14161a)',matte:'#2b2f35',
+      satin:'linear-gradient(135deg,#3c424a,#22262c)',chrome:'linear-gradient(135deg,#eef2f6,#8a95a2)'}[s.finish];
+    $('dot').style.background=dotBg;
+
+    // film
+    const tape=$('tape'), fill=$('fill');
+    fill.className='tape-fill film-'+s.finish;
+    if(s.film){
+      tape.classList.remove('off');
+      const linear = v.m * covF * 1.10;
+      const area = linear * 1.52;
+      $('film').textContent=Math.round(linear);
+      $('area').textContent=Math.round(area);
+      const scaleMax=Math.max(15,Math.ceil(linear/5)*5);
+      if(scaleMax!==lastScale){buildTicks(scaleMax);lastScale=scaleMax;}
+      fill.style.width=Math.min(100,(linear/scaleMax)*100)+'%';
+    } else {
+      tape.classList.add('off');
+      fill.style.width='0%';
+      $('film').textContent='—';
+      $('area').textContent='glass';
+    }
+    $('days').textContent=s.days;
+
+    // telegram deep-link with the selection prefilled
+    const parts=[s.label];
+    if(s.film) parts.push(v.label+' · '+cov.label+' coverage');
+    else parts.push(v.label);
+    const msg='Hi! I\u2019d like a quote.\nService: '+parts.join('\n')+'\nYour estimate showed from \u20AC'+price.toLocaleString('en-US')+'.';
+    $('cta').href='https://t.me/wraplab_demo?text='+encodeURIComponent(msg);
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
